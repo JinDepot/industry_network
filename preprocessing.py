@@ -4,36 +4,14 @@
 
 import pandas as pd
 import glob
-import os
 import re
 
-<<<<<<< HEAD
-embeddings = model.encode(sentences)
-=======
->>>>>>> de83615875c6af37df573ad62555c93b5b053353
 def main():
     # load data
     print('Loading data...')
     data_path = '/home/hyejin/data/'
     filelist = glob.glob(f'{data_path}/10-K/*', recursive=True)
-    len(filelist)
 
-<<<<<<< HEAD
-    #Load sentences & embeddings from disc
-    for i, f in enumerate(filelist):
-        print("   working on %s-th document..." %i, end='\r')
-        # get ticker from filepath
-        ticker = f.split('/')[-1].split('_')[0]
-
-        with open(f, 'r') as content:
-            content = content.read().replace('\r\n',' ').replace('\n',' ')
-            content = re.sub(r'^\W*','',content)
-            content = content.replace('Table of Contents',' ').replace('Overview', '').replace('OVERVIEW', '').replace('and Description of Major Subsidiaries ','')
-            content = re.sub(r'^G(?:\s*eneral\s*)\b\s+','',content)
-            content = ' '.join(content.split())
-            content = content.strip()
-
-=======
     df = pd.DataFrame()
 
     for i, f in enumerate(filelist):
@@ -49,12 +27,16 @@ def main():
             content = ' '.join(content.split())
             content = content.strip()
 
->>>>>>> de83615875c6af37df573ad62555c93b5b053353
         df.loc[i,'ticker'] = ticker
         df.loc[i,'content'] = content
 
+    # add firm info
+    print('Merging company information...')
+    infos = pd.read_csv(f'{data_path}/sp500_namelist_2021.csv')
+    sp500 = pd.merge(df, infos, left_on='ticker', right_on='Ticker', how='inner')
+
     # dump the resulting data
-    df.to_csv(f'{data_path}/sp500_all.csv', index=False)
+    sp500[['ticker','content','Rank','Company','Industry','Market Cap']].to_csv(f'{data_path}/sp500_all.csv', index=False)
     print('Done!')
 
 if __name__ == '__main__':
