@@ -4,7 +4,6 @@
 
 import pandas as pd
 import glob
-import os
 import re
 
 def main():
@@ -12,7 +11,6 @@ def main():
     print('Loading data...')
     data_path = '/home/hyejin/data/'
     filelist = glob.glob(f'{data_path}/10-K/*', recursive=True)
-    len(filelist)
 
     df = pd.DataFrame()
 
@@ -32,8 +30,13 @@ def main():
         df.loc[i,'ticker'] = ticker
         df.loc[i,'content'] = content
 
+    # add firm info
+    print('Merging company information...')
+    infos = pd.read_csv(f'{data_path}/sp500_namelist_2021.csv')
+    sp500 = pd.merge(df, infos, left_on='ticker', right_on='Ticker', how='inner')
+
     # dump the resulting data
-    df.to_csv(f'{data_path}/sp500_all.csv', index=False)
+    sp500[['ticker','content','Rank','Company','Industry','Market Cap']].to_csv(f'{data_path}/sp500_all.csv', index=False)
     print('Done!')
 
 if __name__ == '__main__':
