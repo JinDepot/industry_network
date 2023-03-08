@@ -17,7 +17,7 @@ def main():
     df = pd.DataFrame()
 
     for i, f in enumerate(filelist):
-        print("   working on -th document..." %i, end='\r')
+        print("   working on %s-th document..." %i, end='\r')
         # get ticker from filepath
         ticker = f.split('/')[-1].split('_')[0]
 
